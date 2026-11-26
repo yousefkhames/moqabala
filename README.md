@@ -11,6 +11,15 @@ Question bank, STAR answer builder and a timed mock interview. Arabic and Englis
 <img src="docs/home.png" width="190" alt="Home"> <img src="docs/questions.png" width="190" alt="Question bank"> <img src="docs/star.png" width="190" alt="STAR builder"> <img src="docs/mock.png" width="190" alt="Mock interview">
 </p>
 
+## Screenshots
+
+Captured from the live site (https://yousefkhames.github.io/moqabala/).
+
+<p>
+  <img src="docs/screenshots/live-desktop.png" alt="moqabala desktop view" width="640">
+  <img src="docs/screenshots/live-mobile.png" alt="moqabala mobile view" width="200">
+</p>
+
 ## The pitch
 
 Most people fail interviews on the same three things: they have no clear story ready, they ramble, and they have never answered out loud under a clock. Moqabala drills exactly those.
