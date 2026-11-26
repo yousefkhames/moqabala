@@ -1,0 +1,12 @@
+{
+  "name": "moqabala",
+  "version": "1.0.0",
+  "description": "Interview prep: question bank, STAR answer builder, timed mock interview. Static, client-side.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test tests/logic.test.js",
+    "e2e": "node tests/e2e.js",
+    "serve": "python3 -m http.server 8080"
+  },
+  "devDependencies": { "playwright-core": "^1.49.0" }
+}
