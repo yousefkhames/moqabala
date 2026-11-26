@@ -152,7 +152,7 @@ const ok = (m) => console.log('  ok ' + (++n) + ' ' + m);
   assert.equal((await page.evaluate(() => window.__mq.state())).sessions.length, 1); ok('import restores data');
   fs.writeFileSync('/tmp/bad.json', '[1,2]');
   await page.setInputFiles('#imp', '/tmp/bad.json');
-  assert.match(await page.textContent('#toast'), /not a valid backup/); ok('bad import rejected');
+  await page.waitForFunction(() => /not a valid backup/.test(document.getElementById('toast').textContent), null, { timeout: 3000 }); ok('bad import rejected');
 
   // Arabic + dark + desktop views
   await page.click('#langBtn'); await page.click('#themeBtn');
