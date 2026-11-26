@@ -6,7 +6,10 @@
   "scripts": {
     "test": "node --test tests/logic.test.js",
     "e2e": "node tests/e2e.js",
-    "serve": "python3 -m http.server 8080"
+    "serve": "python3 -m http.server 8080",
+    "dictate": "node tests/dictate.js"
   },
-  "devDependencies": { "playwright-core": "^1.49.0" }
+  "devDependencies": {
+    "playwright-core": "^1.49.0"
+  }
 }

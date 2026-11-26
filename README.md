@@ -17,7 +17,7 @@ Most people fail interviews on the same three things: they have no clear story r
 
 1. Pick from **67 real interview questions** in 10 topics, each with a short tip and an Arabic or English version side by side.
 2. Turn your experience into a **STAR answer** (Situation, Task, Action, Result) and see whether it is complete, balanced and has a number in the result.
-3. Run a **timed mock interview**: random questions, a real countdown, then rate yourself honestly. Watch your score climb over days.
+3. Run a **timed mock interview**: random questions, a real countdown, then rate yourself honestly. Watch your score climb over days. In Chrome or Edge you can dictate your spoken answer into the notes box.
 
 ## Features
 
@@ -56,6 +56,7 @@ python3 -m http.server 8080   # or any static server, then open http://localhost
 npm install          # only needed for the browser test (playwright-core)
 npm test             # 16 unit tests for the logic and data integrity
 npm run e2e -- http://localhost:8080/     # 38 checks in real Chrome
+npm run dictate                            # dictation with a fake speech engine
 ```
 
 The browser test clicks through language and RTL, the checklist, search and filters, notes, custom questions, the whole STAR flow including clipboard and download, a full timed mock (pause, skip, time-up, scoring), export, import, reset, offline cache registration, and checks for horizontal overflow at 390 px and for console errors. It was also run against the live URL.
@@ -63,7 +64,7 @@ The browser test clicks through language and RTL, the checklist, search and filt
 ## Honest limits
 
 - **Your data lives in one browser.** It is `localStorage`: clearing site data, using another browser or a private window means a fresh start. Use Export backup to move it.
-- **No speech analysis.** The timer and filler word count work on what you type in the notes box. The app does not record or listen to your voice.
+- **Dictation is optional and browser dependent.** In Chrome and Edge the Dictate button turns your spoken answer into text (Arabic or English, matching the app language) so the word and filler counts use what you said. The browser sends the audio to its own speech service to do this, and Firefox has no support, so the button is hidden there. The app itself never records or stores audio, and it does not judge delivery, pace or pronunciation.
 - **Scores are self rated.** The score is your own rating plus your checklist, not an AI judgement.
 - **The question bank is general.** It is not tuned to a specific company or field, and the tips are guidance, not guarantees.
 - **GitHub Pages is a demo host.** Fine for trying the app. If you want it for a school, a club or a business, host it where you control the domain.

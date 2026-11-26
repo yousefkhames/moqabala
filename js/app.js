@@ -53,6 +53,7 @@
     }).join('');
   }
   function render() {
+    if (dict.rec && !(ui.run && ui.run.phase === 'answer' && !ui.run.finished)) stopDictate();
     applyShell();
     var r = route(), app = $('#app');
     if (r !== 'mock' && ui.run) stopRun();
@@ -250,7 +251,7 @@
       '<div class="stack grow">' + (r.phase === 'prep' ? '<button class="btn primary" data-act="startnow">' + esc(t('start_now')) + '</button>' :
         '<button class="btn primary" data-act="doneans">✓ ' + esc(t('done_ans')) + '</button>') +
       '<div class="row"><button class="btn sm" data-act="pause">' + esc(r.paused ? t('resume') : t('pause')) + '</button><button class="btn sm" data-act="skipq">' + esc(t('skip')) + '</button><button class="btn sm" data-act="quit">' + esc(t('quit')) + '</button></div></div></div>' +
-      (r.phase === 'answer' ? '<label for="live" class="small" style="opacity:.8">' + esc(t('notes_live')) + '</label><textarea id="live">' + esc(it.note) + '</textarea>' : '') + '</section>';
+      (r.phase === 'answer' ? '<label for="live" class="small" style="opacity:.8">' + esc(t('notes_live')) + '</label><textarea id="live">' + esc(it.note) + '</textarea>' + (SR ? '<div class="row" style="margin-top:8px"><button class="btn sm" data-act="dictate" id="dictbtn" aria-pressed="' + !!dict.rec + '">' + (dict.rec ? '⏹ ' + esc(t('dict_stop')) : '🎤 ' + esc(t('dict_start'))) + '</button><span class="small" id="dictst" style="opacity:.7">' + esc(dict.rec ? t('dict_on') : t('dict_hint')) + '</span></div>' : '') : '') + '</section>';
   }
   function finishRun() {
     var r = ui.run, today = L.dayKey();
@@ -319,7 +320,8 @@
       case 'set': ui.mock[el.dataset.k] = Number(el.dataset.v); render(); break;
       case 'mstart': if (poolSize()) startRun(); break;
       case 'startnow': r.left = 0; r.deadline = 0; r.startedAt = Date.now(); r.phase = 'answer'; r.total = r.limit; r.left = r.limit; r.deadline = Date.now() + r.limit * 1000; render(); break;
-      case 'doneans': saveLive(); toRate(Math.min(r.limit, Math.round(r.limit - r.left))); break;
+      case 'dictate': if (dict.rec) stopDictate(); else startDictate(); render(); break;
+      case 'doneans': stopDictate(); saveLive(); toRate(Math.min(r.limit, Math.round(r.limit - r.left))); break;
       case 'pause': saveLive(); if (r.paused) { r.deadline = Date.now() + r.left * 1000; r.paused = false; } else { r.left = Math.max(0, Math.ceil((r.deadline - Date.now()) / 1000)); r.paused = true; } render(); break;
       case 'skipq': r.items[r.i].skipped = true; clearInterval(r.timer); advance(); break;
       case 'quit': if (confirm(t('confirm_quit'))) { stopRun(); render(); } break;
@@ -330,6 +332,22 @@
       case 'reset': if (confirm(t('confirm_reset'))) { var lang = S.lang; S = fresh(); S.lang = lang; save(); render(); } break;
     }
   });
+  /* optional dictation: the browser's speech recognition turns your spoken answer into the notes box, so words and fillers are counted on what you said */
+  var SR = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
+  var dict = { rec: null };
+  function stopDictate() { if (dict.rec) { var r = dict.rec; dict.rec = null; try { r.onend = null; r.stop(); } catch (e) { } } }
+  function startDictate() {
+    if (!SR || dict.rec) return;
+    var rec = new SR(); rec.lang = S.lang === 'ar' ? 'ar-EG' : 'en-US'; rec.continuous = true; rec.interimResults = false;
+    rec.onresult = function (ev) {
+      var ta = $('#live'); if (!ta || !ui.run) return; var add = '';
+      for (var k = ev.resultIndex; k < ev.results.length; k++) if (ev.results[k].isFinal) add += ev.results[k][0].transcript + ' ';
+      if (add) { ta.value = (ta.value ? ta.value.replace(/\s*$/, ' ') : '') + add.trim() + ' '; ui.run.items[ui.run.i].note = ta.value; }
+    };
+    rec.onerror = function (ev) { var st = $('#dictst'); if (st) st.textContent = ev.error === 'not-allowed' ? t('dict_denied') : t('dict_err'); if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') { dict.rec = null; var b = $('#dictbtn'); if (b) b.textContent = '🎤 ' + t('dict_start'); } };
+    rec.onend = function () { if (dict.rec === rec) { try { rec.start(); } catch (e) { dict.rec = null; } } };
+    dict.rec = rec; try { rec.start(); } catch (e) { dict.rec = null; }
+  }
   function saveLive() { var ta = $('#live'); if (ta && ui.run) ui.run.items[ui.run.i].note = ta.value; }
   function advance() {
     var r = ui.run; if (r.i >= r.items.length - 1) { finishRun(); return; }
